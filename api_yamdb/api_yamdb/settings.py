@@ -1,5 +1,5 @@
 import os
-
+from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -34,6 +36,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'api_yamdb.urls'
+
+SECRET_KEY = 'kolidiana'
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 TEMPLATES = [
@@ -54,7 +58,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
+EMAIL_BACKEND = 'django.core.mail.filebased.EmailBackend'
 
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 # Database
 
 DATABASES = {
@@ -64,7 +70,7 @@ DATABASES = {
     }
 }
 
-
+AUTH_USER_MODEL = 'users.User'
 # Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -82,6 +88,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated'
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
 
 # Internationalization
 
