@@ -11,7 +11,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('username', 'email', 'password', 'bio', 'role')
 
     def create(self, validated_data):
         User.objects.create_user(**validated_data)
@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'token')
+        fields = ('username', 'password', 'email', 'bio', 'role')
 
     token = serializers.SerializerMethodField()
     password = serializers.CharField(
@@ -41,7 +41,21 @@ class UserSerializer(serializers.ModelSerializer):
         paswword = validated_data.pop('password', None)
         email = validated_data.pop('email', None)
         instance = self.Meta.model(**validated_data)
-        if (paswword is not None) and(email is not None):
+        if (paswword is not None) and (email is not None):
             instance.set_password(paswword)
             instance.save()
             return instance
+
+
+class AdminSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'password',
+            'bio',
+            'role'
+        )
+        read_only_fields = ('role', )
