@@ -62,6 +62,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
 
+
 class Review(models.Model):
     SCORE_CHOICES = (
         (1, '1. Ужасно.'),

@@ -6,7 +6,6 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework import filters
 from django.core.mail import send_mail
-from rest_framework.permissions import IsAdminUser
 
 
 from .serializers import RegistrationSerializer, AdminSerializer
@@ -29,4 +28,3 @@ class UserSerializer(APIView):
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminSerializer
-    permission_classes = (IsAdminUser,)

@@ -22,7 +22,6 @@ router_v1.register(
 router.register('categories', CategoryViewSet, basename='categoties')
 router.register('genres', GenreViewSet, basename='genres')
 router.register('titles', TitleViewSet, basename='titles')
-
 urlpatterns = [
     path('v1/', include(router.urls)),
     path('v1/', include(router_v1.urls))

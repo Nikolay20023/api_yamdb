@@ -3,12 +3,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
+
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=128,
         min_length=8,
         write_only=True
     )
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'bio', 'role')
