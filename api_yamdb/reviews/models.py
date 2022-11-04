@@ -1,7 +1,67 @@
+from users.models import User
 from django.db import models
+from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
-    
+
+class Category(models.Model):
+    name = models.CharField(
+        'Название категории',
+        max_length=256
+    )
+    slug = models.SlugField(unique=True, max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категория'
+
+
+class Genre(models.Model):
+    name = models.CharField(
+        'Название жанра',
+        max_length=256
+    )
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Жанр'
+
+
+class Title(models.Model):
+    name = models.CharField(max_length=256)
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='titles',
+        verbose_name='Категория'
+    )
+    genre = models.ManyToManyField(
+        'Genre',
+        related_name='titles',
+        verbose_name='Жанр'
+    )
+    description = models.TextField(
+        'Описание',
+        blank=True,
+        null=True
+    )
+    year = models.IntegerField(
+        verbose_name='Год',
+        validators=[MaxValueValidator(timezone.now().year)]
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Произведение'
+
 class Review(models.Model):
     SCORE_CHOICES = (
         (1, '1. Ужасно.'),
@@ -19,7 +79,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         verbose_name='titles',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='reviews'
     )
     text = models.TextField()
@@ -59,7 +119,7 @@ class Comments(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         related_name='comments',
-        related_name='Автор комментария',
+        # related_name='Автор комментария',
     )
     pub_date = models.DateTimeField(
         default=timezone.now,

@@ -17,7 +17,9 @@ CHOICES_ROLE = [
 class UserManager(BaseUserManager):
     """Чтобы определить кастомного пользователя определяем свой менеджер."""
 
-    def create_user(self, username, email=None, password=None):
+    def create_user(
+        self, username, bio, email=None, password=None, role='users',
+    ):
         """Создаём обычного пользователя."""
         if username is None:
             raise TypeError('Пользователи должны быть с именем.')
@@ -56,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         'Биография',
         blank=True
     )
-    confirmation_code = models.CharField(null=False, blank=False)
+    confirmation_code = models.CharField(null=True, blank=False, max_length=16)
     role = models.CharField(
         max_length=16,
         choices=CHOICES_ROLE,

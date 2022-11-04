@@ -1,8 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (CommentViewSet, ReviewViewSet)
+from .views import (CategoryViewSet, GenreViewSet,
+                    TitleViewSet)
 
-
+router = DefaultRouter
 router_v1 = DefaultRouter()
 
 router_v1.register(
@@ -13,3 +15,11 @@ router_v1.register(
     CommentViewSet,
     basename='comment',
 )
+router.register('categories', CategoryViewSet, basename='categoties')
+router.register('genres', GenreViewSet, basename='genres')
+router.register('titles', TitleViewSet, basename='titles')
+
+urlpatterns = [
+    path('v1/', include(router.urls)),
+    path('v1/', include(router_v1.urls))
+]

@@ -1,8 +1,62 @@
 from rest_framework import serializers
 from reviews.models import Comments, Review
 from rest_framework.validators import UniqueValidator
+from rest_framework.serializers import ModelSerializer, IntegerField
+from rest_framework.relations import SlugRelatedField
+
+from reviews.models import Category, Genre, Title
 
 
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+
+class GengreSerializer(ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
+class TitleSerializer(ModelSerializer):
+    category = SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = SlugRelatedField(
+        queryset=Genre.objects.all(),
+        many=True,
+        slug_field='slug'
+    )
+
+    class Meta:
+        model = Title
+        fields = (
+            'name',
+            'category',
+            'genre',
+            'description',
+            'year'
+        )
+
+
+class TitleReadSerializer(ModelSerializer):
+    genre = GengreSerializer(read_only=True, many=True)
+    category = CategorySerializer(read_only=True)
+    rating = IntegerField(read_only=True, required=False)
+
+    class Meta:
+        model = Title
+        fields = (
+            'id',
+            'name',
+            'category',
+            'genre',
+            'description',
+            'year',
+            'rating'
+        )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
