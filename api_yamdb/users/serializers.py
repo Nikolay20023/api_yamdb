@@ -40,11 +40,9 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        paswword = validated_data.pop('password', None)
         email = validated_data.pop('email', None)
         instance = self.Meta.model(**validated_data)
-        if (paswword is not None) and (email is not None):
-            instance.set_password(paswword)
+        if  email is not None:
             instance.save()
             return instance
 

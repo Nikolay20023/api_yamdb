@@ -66,7 +66,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=False,
     )
     bio = models.TextField(
-        'Биография',
         blank=True
     )
     confirmation_code = models.CharField(null=True, blank=False, max_length=16)
@@ -76,7 +75,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default='user'
     )
     is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
