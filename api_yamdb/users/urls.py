@@ -4,7 +4,6 @@ from .views import UserApi
 from .views import UserInfo
 
 urlpatterns = [
-    path('v1/auth/signup/', UserApi.as_view()),
     path(
         'token/',
         jwt_views.TokenObtainPairView.as_view(),
