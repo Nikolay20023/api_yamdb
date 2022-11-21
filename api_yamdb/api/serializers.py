@@ -33,6 +33,7 @@ class TitleSerializer(ModelSerializer):
     class Meta:
         model = Title
         fields = (
+            'id',
             'name',
             'category',
             'genre',

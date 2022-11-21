@@ -70,8 +70,16 @@ class User(AbstractUser):
     def hash_confirmation_code(self, confirmation_code):
         """Хэшируем confirmation_code."""
         salt = uuid.uuid4().hex
-        confirmation_code = (hashlib.sha256(salt.encode() + confirmation_code.encode()).hexdigest() + ':' + salt)
-        return (hashlib.sha256(salt.encode() + confirmation_code.encode()).hexdigest() + ':' + salt)
+        confirmation_code = (
+            hashlib.sha256(
+                salt.encode() + confirmation_code.encode()
+            ).hexdigest() + ':' + salt
+        )
+        return (
+            hashlib.sha256(
+                salt.encode() + confirmation_code.encode()
+            ).hexdigest() + ':' + salt
+        )
 
     def check_confirmation_code(self, hash_code, user_code):
         """Декодировка и проверка."""
