@@ -1,5 +1,5 @@
 # API_yatube 
-## Автор: nikolay20023
+## Автор: AnnaMolodova, Dmitrii-Kiselev-31, nikolay20023
 
 
 API_yautube - это API интерфейс предназначеный для развития функционала сайта.
@@ -69,4 +69,6 @@ http://127.0.0.1:8000/api/v1/posts/{post_id}/comments/
 http://127.0.0.1:8000/redoc/
 ```
 ## Работа
+Молодова А.А.
+Киселев Д.А.
 Судаков Н.В.
