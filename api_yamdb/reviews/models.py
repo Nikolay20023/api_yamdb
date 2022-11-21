@@ -15,6 +15,7 @@ class Category(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Категория'
 
 
@@ -29,6 +30,7 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Жанр'
 
 
@@ -98,6 +100,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['pub_date']
         constraints = [
             models.UniqueConstraint(
                 fields=["title", "author"], name="unique_review"
@@ -129,3 +132,7 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text
+
+
+    class Meta:
+        ordering = ['pub_date']
