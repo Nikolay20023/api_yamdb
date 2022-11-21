@@ -2,18 +2,19 @@ from django.db import models
 from django.contrib.auth.models import (
     AbstractUser,
 )
-from django.utils.crypto import get_random_string
-import uuid
-import hashlib
 
 
 class User(AbstractUser):
     """Model User от AbstractUser."""
 
-    ROlE = (
-        ('user', 'Пользователь'),
-        ('moderator', 'Модератор'),
-        ('admin', 'Администратор')
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+    USER_ROLES = (
+        (USER, 'User'),
+        (MODERATOR, 'Moderator'),
+        (ADMIN, 'Admin')
     )
     password = models.CharField(
         'Пароль',
@@ -29,13 +30,15 @@ class User(AbstractUser):
     confirmation_code = models.CharField(
         'Код подтверждения',
         max_length=256,
+        null=True,
+        editable=False,
         blank=True
     )
     role = models.CharField(
         'Роль',
         max_length=30,
-        choices=ROlE,
-        default='user'
+        choices=USER_ROLES,
+        default=USER
     )
 
     class Meta:
@@ -56,35 +59,12 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         """."""
-        return self.role == 'admin'
+        return (
+            self.role == User.ADMIN
+            or self.is_superuser
+        )
 
     @property
     def is_moderator(self):
         """."""
-        return self.role == 'moderator'
-
-    def make_confirmation_code(self):
-        """Делаем confirmation_code."""
-        return get_random_string()
-
-    def hash_confirmation_code(self, confirmation_code):
-        """Хэшируем confirmation_code."""
-        salt = uuid.uuid4().hex
-        confirmation_code = (
-            hashlib.sha256(
-                salt.encode() + confirmation_code.encode()
-            ).hexdigest() + ':' + salt
-        )
-        return (
-            hashlib.sha256(
-                salt.encode() + confirmation_code.encode()
-            ).hexdigest() + ':' + salt
-        )
-
-    def check_confirmation_code(self, hash_code, user_code):
-        """Декодировка и проверка."""
-        confirmation_code, salt = hash_code.split(':')
-        return (
-            confirmation_code == hashlib.sha256
-            (salt.encode() + user_code.encode()).hexdigest()
-        )
+        return self.role == User.MODERATOR

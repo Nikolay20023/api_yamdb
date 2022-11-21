@@ -7,6 +7,11 @@ from .views import (
     GenreViewSet,
     TitleViewSet
 )
+from users.views import (
+    RegistrationClass,
+    GetTokenClass,
+    AdminViewSet
+)
 
 router = DefaultRouter()
 router_v1 = DefaultRouter()
@@ -19,10 +24,13 @@ router_v1.register(
     CommentViewSet,
     basename='comment',
 )
+router_v1.register(r'users', AdminViewSet)
 router.register('categories', CategoryViewSet, basename='categoties')
 router.register('genres', GenreViewSet, basename='genres')
 router.register('titles', TitleViewSet, basename='titles')
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/', include(router_v1.urls))
+    path('', include(router.urls)),
+    path('', include(router_v1.urls)),
+    path(r'auth/signup/', RegistrationClass.as_view()),
+    path(r'auth/token/', GetTokenClass.as_view()),
 ]

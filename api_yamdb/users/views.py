@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from .serializers import (
+from api.serializers import (
     UserAuthSerializer,
     UserCreationSerializer,
     UserSerializers,
@@ -8,12 +8,17 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from django.core.mail import send_mail
 from .models import User
+from django.contrib.auth.tokens import default_token_generator
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, filters
 from rest_framework.permissions import IsAuthenticated
-from .permissions import AdminOrSuperUSerOnly
+from api.permissions import AdminOrSuperUSerOnly
 from rest_framework.pagination import LimitOffsetPagination
+from django.shortcuts import get_object_or_404
+from django.conf import settings
+from rest_framework_simplejwt.tokens import AccessToken
+from django.utils.crypto import get_random_string
 
 
 class RegistrationClass(APIView):
@@ -24,24 +29,25 @@ class RegistrationClass(APIView):
 
     def post(self, request):
         """POST запрос для регистрации."""
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = User.objects.create(**serializer.data)
-            user.is_active = False
-            confirmation_code = user.make_confirmation_code()
-            send_mail(
-                'welcome',
-                f'{confirmation_code}',
-                'EMAIL_HOST',
-                [f'{user.email}', ]
-            )
-            user.confirmation_code = User.hash_confirmation_code(
-                self,
-                confirmation_code
-            )
-            user.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserCreationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.data['email']
+        username = serializer.data['username']
+
+        user, _ = User.objects.get_or_create(email=email, username=username)
+        user.password = get_random_string()
+        confirmation_code = default_token_generator.make_token(user)
+
+        send_mail(
+            'Код подтверждения',
+            f'Ваш код подтверждения: {confirmation_code}',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetTokenClass(APIView):
@@ -52,12 +58,22 @@ class GetTokenClass(APIView):
     def post(self, request):
         """POST запрос на получение JWT токена."""
         serializer = UserAuthSerializer(data=request.data)
-        if serializer.is_valid():
+        if not serializer.is_valid():
             return Response(
-                data={'access': str(serializer.validated_data)},
-                status=status.HTTP_200_OK
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        username = serializer.data.get('username')
+        confirmation_code = serializer.data.get('confirmation_code')
+        user = get_object_or_404(User, username=username)
+        if default_token_generator.check_token(user, confirmation_code):
+            token = AccessToken.for_user(user)
+            return Response(
+                {token: str(token)}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {'confirmation_code': 'Неверный код подтверждения'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class AdminViewSet(viewsets.ModelViewSet):
@@ -82,11 +98,9 @@ class AdminViewSet(viewsets.ModelViewSet):
         """Запрос на me."""
         user = self.request.user
         if request.method == 'GET':
-            serializer = UserSerializers(user)
+            serializer = self.get_serializer(user)
             return Response(serializer.data)
         serializer = UserSerializers(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        if serializer.validated_data.get('role'):
-            serializer.validated_data.pop('role')
-        serializer.save()
-        return Response(serializer.data)
+        serializer.save(role=user.role, partial=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
