@@ -1,14 +1,16 @@
-from django.urls import path
-from rest_framework_simplejwt import views as jwt_views
-from .views import UserApi
-from .views import UserInfo
+from django.urls import path, include
+from . views import (
+    RegistrationClass,
+    GetTokenClass,
+    AdminViewSet,
+)
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'users', AdminViewSet)
 
 urlpatterns = [
-    path(
-        'token/',
-        jwt_views.TokenObtainPairView.as_view(),
-        name='token_obtain_pair'
-    ),
-    path('v1/auth/token/', jwt_views.TokenRefreshView, name='token_refresh'),
-    path('v1/users/me/', UserInfo.as_view(), name='user_info')
+    path(r'v1/auth/signup/', RegistrationClass.as_view()),
+    path(r'v1/auth/token/', GetTokenClass.as_view()),
+    path('v1/', include(router.urls)),
 ]
