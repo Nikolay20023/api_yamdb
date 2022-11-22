@@ -136,7 +136,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('title', 'id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, data):
-        if self.context['request'].method == 'PATCH':
+        if self.context['request'].method != 'POST':
             return data
         title = self.context['view'].kwargs['title_id']
         author = self.context['request'].user
