@@ -17,7 +17,7 @@ from .permissions import AdminOrReadOnly
 from .filters import TitleFilter
 from reviews.models import Category, Genre, Title
 from rest_framework.views import APIView
-from api.serializers import (
+from .serializers import (
     UserAuthSerializer,
     UserCreationSerializer,
     UserSerializers,
@@ -31,7 +31,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, filters
 from rest_framework.permissions import IsAuthenticated
-from api.permissions import AdminOrSuperUSerOnly
+from .permissions import AdminOrSuperUSerOnly
 from rest_framework.pagination import LimitOffsetPagination
 from django.shortcuts import get_object_or_404
 from django.conf import settings
